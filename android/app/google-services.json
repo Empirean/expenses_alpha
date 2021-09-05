@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "84862175593",
+    "project_id": "expnsesalpha",
+    "storage_bucket": "expnsesalpha.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84862175593:android:d45c7e06972dabb75dd5f8",
+        "android_client_info": {
+          "package_name": "com.hamunchi.expenses_alpha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "84862175593-b8s1bikk8npstks5khk65l494a7budbd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcg4WTZH6_HsI3XFc4yoFeH-eLQcdjEzg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "84862175593-b8s1bikk8npstks5khk65l494a7budbd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
