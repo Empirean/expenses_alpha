@@ -73,10 +73,10 @@ class _HomeState extends State<Home> {
               return Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    colorFilter: ColorFilter.mode(
-                        Colors.blue,
-                        BlendMode.softLight
-                    ),
+                    // colorFilter: ColorFilter.mode(
+                    //     Colors.blue,
+                    //     BlendMode.softLight
+                    // ),
                     image: AssetImage("assets/main.jpg"),
                     fit: BoxFit.cover,
                   ),
@@ -218,7 +218,6 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20,),
                     Expanded(
                       flex: 1,
                       child: SingleChildScrollView(
@@ -262,7 +261,48 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 50,)
+                    Card(
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
+                      ),
+                      color: Colors.red,
+                      child: GestureDetector(
+                        onTap: () {
+                          List<double> _expensesInitEntries = [];
+                          for (int i = 0; i < _getNumberOfDays(); i++) {
+                            _expensesInitEntries.add(0.0);
+                          }
+
+                          Map<String, dynamic> data = {
+                            "EXPENSE_ID" : DateFormat("MMyyyy").format(_currentDate) + DateFormat("Hms").format(DateTime.now()),
+                            "EXPENSE_NAME" : "Untitled",
+                            "EXPENSE_DATA" : _expensesInitEntries
+                          };
+
+                          DatabaseService(path: user.uid + "/" + _path + "/EXPENSES").addExpenseEntry(data);
+
+                          final snackBar = SnackBar(
+                            content: Text("New Entry has been added"),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {},
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        },
+                        child: ListTile(
+                          title: Center(child: Text("New Entry",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30.0
+                            ),
+                          )),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -276,27 +316,6 @@ class _HomeState extends State<Home> {
 
         },
 
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        backgroundColor: Colors.red,
-        onPressed: () {
-
-          List<double> _expensesInitEntries = [];
-          double x = 0;
-          for (int i = 0; i < _getNumberOfDays(); i++) {
-            _expensesInitEntries.add(x++);
-          }
-
-          Map<String, dynamic> data = {
-            "EXPENSE_ID" : DateFormat("MMyyyy").format(_currentDate) + DateFormat("Hms").format(DateTime.now()),
-            "EXPENSE_NAME" : "Entry",
-            "EXPENSE_DATA" : _expensesInitEntries
-          };
-
-          DatabaseService(path: user.uid + "/" + _path + "/EXPENSES").addExpenseEntry(data);
-        },
       ),
     );
   }
@@ -318,6 +337,7 @@ class _HomeState extends State<Home> {
                   textAlign: i == "Entries" ? TextAlign.start : TextAlign.right,
                 ),
               ),
+            numeric: i == "Entries" ? false : true,
           )
       );
     }
@@ -364,6 +384,73 @@ class _HomeState extends State<Home> {
                 color: Colors.white
               ),
             ),
+            onLongPress: () {
+              showModalBottomSheet(backgroundColor: Colors.pink.withOpacity(0.9),
+                  context: context,
+                  builder: (context) {
+                return Column(
+                  children: [
+                    SizedBox(height: 50,),
+                    Text("Delete " + expenseData[i]["EXPENSE_NAME"] + "?",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30.0
+                      ),
+                    ),
+                    SizedBox(height: 50,),
+                    Card(
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
+                      ),
+                      color: Colors.red,
+                      child: GestureDetector(
+                        onTap: () {
+                          DatabaseService(path: userId + "/" + _path + "/EXPENSES").deleteExpenseEntry(expenseData[i].id);
+                          Navigator.pop(context);
+                        },
+                        child: ListTile(
+                          title: Center(child: Text("Delete",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30.0
+                            ),
+                          )),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
+                      ),
+                      color: Colors.red,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: ListTile(
+                          title: Center(child: Text("Cancel",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30.0
+                            ),
+                          )),
+                        ),
+                      ),
+                    ),
+                    CircleAvatar(
+                      backgroundImage: AssetImage("assets/confused_cat.png"),
+                      radius: 50.0,
+                    )
+                  ],
+                );
+              });
+            },
             onTap: () {
               Navigator.pushNamed(context, "/budget_data", arguments: {
                 "MODE" : mode.entryName,
@@ -381,8 +468,9 @@ class _HomeState extends State<Home> {
             Text(_formatter.format(expenseData[i]["EXPENSE_DATA"][j-1]),
               style: TextStyle(
                 fontSize: 25,
-                color: Colors.white
+                color: Colors.white,
               ),
+              textAlign: TextAlign.right,
             ),
             onTap: () {
 
@@ -404,7 +492,7 @@ class _HomeState extends State<Home> {
       }
       _dataRows.add(new DataRow(
           cells: _cellList,
-          color: MaterialStateColor.resolveWith((states) => Colors.blueAccent.withOpacity(0.4))
+          color: MaterialStateColor.resolveWith((states) => Colors.pink.withOpacity(0.9))
       ));
     }
 
