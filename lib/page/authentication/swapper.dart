@@ -11,25 +11,23 @@ class Swapper extends StatefulWidget {
 
 class _SwapperState extends State<Swapper> {
 
-  bool toggler = true;
+  bool togglePage = true;
 
   void toggle(){
     setState(() {
-      toggler = !toggler;
+      togglePage = !togglePage;
     });
   }
 
   @override
   Widget build(BuildContext context) {
 
-    if (toggler){
+    if (togglePage){
       return Login(toggleView: toggle,);
     }
     else{
       return Register(toggleView: toggle,);
     }
-
-    return Container();
   }
 }
 

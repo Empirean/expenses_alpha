@@ -1,4 +1,5 @@
 import 'package:expenses_alpha/models/expenseuser.dart';
+import 'package:expenses_alpha/shared/modesenum.dart';
 import 'package:expenses_alpha/shared/textdecor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,31 +7,76 @@ import 'package:provider/provider.dart';
 import 'package:expenses_alpha/services/database.dart';
 
 class BudgetData extends StatefulWidget {
-
   @override
   _BudgetDataState createState() => _BudgetDataState();
 }
 
+// form variables
+final _formKey = GlobalKey<FormState>();
+final _controller = TextEditingController();
+
 class _BudgetDataState extends State<BudgetData> {
 
-  final _formKey = GlobalKey<FormState>();
-  final _controller = TextEditingController();
-
-  String _budget = "";
-  String _budgetId = "";
+  // parameters
+  mode _mode;
   Map _data = {};
+  String _title = "Not title";
+  String _hint = "No hint";
+  String _documentId = "";
+  String _entryData = "";
+  String _path = "";
+  int _index;
+  List<dynamic> _expenseSet = [];
 
   @override
   void initState() {
     Future.delayed(Duration.zero,(){
+      _controller.clear();
       _data = ModalRoute.of(context).settings.arguments;
       if (_data != null) {
-        setState(() {
-          _budgetId = _data["DOCUMENT_ID"];
-          _controller.text = _data["BUDGET_AMOUNT"].toString();
-        });
-      }
 
+        // mode
+        _mode = _data["MODE"];
+        _documentId = _data["DOCUMENT_ID"];
+
+        // budget data entry
+        if (_mode == mode.budgetData) {
+
+          _title = "Budget Amount";
+          _hint = "amount";
+
+          setState(() {
+            _controller.text = _data["BUDGET_AMOUNT"].toString();
+          });
+        }
+
+        // expense entry name
+        if (_mode == mode.entryName) {
+
+          _title = "Expense Description";
+          _hint = "description";
+
+          _path = _data["PATH"];
+          setState(() {
+            _controller.text = _data["ENTRY_NAME"].toString();
+          });
+        }
+
+        // expense entry value
+        if (_mode == mode.entryData) {
+
+          _title = "Expense Value";
+          _hint = "amount";
+
+          _path = _data["PATH"];
+          _expenseSet = _data["EXPENSE_SET"];
+          _index = int.parse(_data["EXPENSE_INDEX"].toString());
+
+          setState(() {
+            _controller.text = _data["EXPENSE_VALUE"].toString();
+          });
+        }
+      }
     });
     super.initState();
   }
@@ -40,7 +86,7 @@ class _BudgetDataState extends State<BudgetData> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text("Budget"),
+        title: Text(_title),
         actions: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -49,21 +95,35 @@ class _BudgetDataState extends State<BudgetData> {
             icon: Icon(Icons.save_rounded),
             label: SizedBox(),
             onPressed: () async {
+
+              final user = Provider.of<ExpenseUser>(context, listen:false);
+
               if (_formKey.currentState.validate())
               {
-                setState(() {
-                  final user = Provider.of<ExpenseUser>(context, listen:false);
-                  print(user.uid);
-
+                // budget data entry
+                if (_mode == mode.budgetData) {
                   Map<String, dynamic> data = {
-                    "BUDGET_AMOUNT" : double.parse(_budget),
+                    "BUDGET_AMOUNT" : double.parse(_entryData),
                   };
+                  DatabaseService(path: user.uid).updateExpenseEntry(data, _documentId);
+                }
 
-                  DatabaseService(path: user.uid).updateExpenseEntry(data, _budgetId);
+                if (_mode == mode.entryName) {
+                  Map<String, dynamic> data = {
+                    "EXPENSE_NAME" : _entryData
+                  };
+                  DatabaseService(path: _path).updateExpenseEntry(data, _documentId);
+                }
 
-                  Navigator.pop(context);
+                if (_mode == mode.entryData) {
+                  _expenseSet[_index] = int.parse(_entryData);
+                  Map<String, dynamic> data = {
+                    "EXPENSE_DATA" : _expenseSet
+                  };
+                  DatabaseService(path: _path).updateExpenseEntry(data, _documentId);
+                }
 
-                });
+                Navigator.pop(context);
               }
             },
           ),
@@ -86,8 +146,8 @@ class _BudgetDataState extends State<BudgetData> {
                   child: TextFormField(
                     controller: _controller,
                     maxLength: 15,
-                    keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
-                    inputFormatters: [
+                    keyboardType: _mode == mode.entryName ? TextInputType.text : TextInputType.numberWithOptions(decimal: true, signed: false),
+                    inputFormatters: _mode == mode.entryName ? [] : [
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                       TextInputFormatter.withFunction((oldValue, newValue) {
                         try{
@@ -97,22 +157,21 @@ class _BudgetDataState extends State<BudgetData> {
                         }catch (e) {}
                         return oldValue;
                       }),
-
                     ],
-                    validator: (val) => val.isEmpty ? "Budget cannot be empty" : null,
+                    validator: (val) => val.isEmpty ? _title + " cannot be empty" : null,
                     style: TextStyle(
                       color: Colors.white
                     ),
                     cursorColor: Colors.white,
                     decoration: textDecoration.copyWith(
-                      hintText: "budget",
+                      hintText: _hint,
                       hintStyle: TextStyle(
                         color: Colors.white
                       )
                     ),
                     onChanged: (val) {
                       setState(() {
-                        _budget = val;
+                        _entryData = val;
                       });
                     },
                   ),
