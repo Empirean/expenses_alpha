@@ -1,6 +1,7 @@
 import 'package:expenses_alpha/models/expenseuser.dart';
 import 'package:expenses_alpha/services/authentication.dart';
 import 'package:expenses_alpha/services/database.dart';
+import 'package:expenses_alpha/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,6 @@ class _HomeState extends State<Home> {
   String _path;
   DateTime _currentDate;
   List<String> _days;
-  List<DataRow> _dataRows = [];
   int _sortColumnIndex;
   bool _isAscending = false;
   var _formatter = NumberFormat('###,###,##0.00');
@@ -36,7 +36,9 @@ class _HomeState extends State<Home> {
     final user = Provider.of<ExpenseUser>(context, listen: false);
 
     return Scaffold(
+      backgroundColor: Colors.pink,
       appBar: AppBar(
+        shadowColor: Colors.white,
         backgroundColor: Colors.red,
         title: Text("Expenses"),
         actions: [
@@ -57,7 +59,6 @@ class _HomeState extends State<Home> {
       body: StreamBuilder(
         stream: DatabaseService(path: user.uid).watchDocuments(field: "BUDGET_DATE", filter:  DateFormat("MMyyyy").format(_currentDate)),
         builder: (context, snapshot) {
-
           if (snapshot.hasData) {
             int _dataSize = snapshot.data.size;
 
@@ -70,7 +71,7 @@ class _HomeState extends State<Home> {
             }
             else{
               var _budgetData = snapshot.data.docs;
-              // _budgetAmount = _budgetData[0]["BUDGET_AMOUNT"].toDouble();
+
               _path = _budgetData[0].id;
 
               return Container(
@@ -120,15 +121,13 @@ class _HomeState extends State<Home> {
                                           );
                                         }
                                         else
-                                          return Container(
-                                            child: Text("No Data"),
-                                          );
+                                          return Loading();
                                       }
 
                                     );
                                   }
                                   else{
-                                    return Container();
+                                    return Loading();
                                   }
                                 },
                               )
@@ -238,7 +237,6 @@ class _HomeState extends State<Home> {
                                             stream: _getRows(expenses, user.uid),
                                             builder: (context, expenseRows) {
                                               if (expenseRows.hasData) {
-
                                                 return  DataTable(
                                                   decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1)),
                                                   dividerThickness: 5,
@@ -250,8 +248,11 @@ class _HomeState extends State<Home> {
                                                   rows:expenseRows.data,);
                                               }
                                               else{
-
-                                                return  Container();
+                                                return  DataTable(
+                                                  headingRowColor: MaterialStateColor.resolveWith(
+                                                          (states) => Colors.red),
+                                                  columns: _getColumns(),
+                                                  rows:[],);
                                               }
                                             }
                                         );
@@ -259,7 +260,7 @@ class _HomeState extends State<Home> {
                                       else {
                                         return  DataTable(
                                           headingRowColor: MaterialStateColor.resolveWith(
-                                                  (states) => Colors.pink),
+                                                  (states) => Colors.red),
                                           columns: _getColumns(),
                                           rows:[],);
                                       }
@@ -315,11 +316,10 @@ class _HomeState extends State<Home> {
                 ),
               );
             }
-            return Container();
-
+            return Loading();
           }
           else{
-            return Container();
+            return Loading();
           }
 
         },
@@ -378,8 +378,7 @@ class _HomeState extends State<Home> {
   }
 
   Stream<List<DataRow>> _getRows(var expenses, String userId) async* {
-    _dataRows = [];
-    int _currentDayCount = DateTime(_currentDate.year, _currentDate.month, 0).day;
+    List<DataRow> _dataRows = [];
 
     var expenseData = expenses.data.docs;
 
@@ -387,7 +386,7 @@ class _HomeState extends State<Home> {
 
       List<DataCell> _cellList = [];
 
-      for(int j = 0; j < _currentDayCount; j++)
+      for(int j = 0; j < _days.length; j++)
       {
         if (j == 0)
         {

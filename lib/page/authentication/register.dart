@@ -1,4 +1,5 @@
 import 'package:expenses_alpha/services/authentication.dart';
+import 'package:expenses_alpha/shared/loading.dart';
 import 'package:expenses_alpha/shared/textdecor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class _RegisterState extends State<Register> {
   String _email = "";
   String _password = "";
   String _errorText = "";
+  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -122,19 +124,26 @@ class _RegisterState extends State<Register> {
                 color: Colors.red,
                 child: GestureDetector(
                   onTap: () async {
+                    FocusScope.of(context).unfocus();
                     if (_formKey.currentState.validate())
                     {
-                      // _isLoading = true;
-                      dynamic result = await AuthenticationService().signUpEmail(_email, _password);
-                      // _isLoading = false;
                       setState(() {
-                        if (result is String)
-                          _errorText = result;
+                        _isLoading = true;
                       });
+                      dynamic result = await AuthenticationService().signUpEmail(_email, _password);
+                      if (result is String){
+                        setState(() {
+                          _errorText = result;
+                          _isLoading = false;
+                        });
+                      }
+
                     }
                   },
                   child: ListTile(
-                    title: Center(child: Text("Register",
+                    title: Center(child: _isLoading ?
+                    Loading() :
+                    Text("Register",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 30.0
