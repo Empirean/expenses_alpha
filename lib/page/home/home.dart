@@ -158,6 +158,7 @@ class _HomeState extends State<Home> {
                                           onTap: () {
                                             setState(() {
                                               _currentDate =  new DateTime(_currentDate.year, _currentDate.month - 1, _currentDate.day);
+                                              _days = _generateDayList(_currentDate);
                                             });
                                           },
                                           child: ListTile(
@@ -195,6 +196,7 @@ class _HomeState extends State<Home> {
                                           onTap: () {
                                             setState(() {
                                               _currentDate =  new DateTime(_currentDate.year, _currentDate.month + 1, _currentDate.day);
+                                              _days = _generateDayList(_currentDate);
                                             });
                                           },
                                           child: ListTile(
@@ -386,7 +388,7 @@ class _HomeState extends State<Home> {
 
       List<DataCell> _cellList = [];
 
-      for(int j = 0; j < _days.length; j++)
+      for(int j = 0; j < _getNumberOfDays() + 1; j++)
       {
         if (j == 0)
         {
