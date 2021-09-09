@@ -116,7 +116,7 @@ class _BudgetDataState extends State<BudgetData> {
                 }
 
                 if (_mode == mode.entryData) {
-                  _expenseSet[_index] = int.parse(_entryData);
+                  _expenseSet[_index] = double.parse(_entryData);
                   Map<String, dynamic> data = {
                     "EXPENSE_DATA" : _expenseSet
                   };
