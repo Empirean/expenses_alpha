@@ -49,9 +49,22 @@ class _RegisterState extends State<Register> {
           child: Column(
             children: [
               SizedBox(height: 20,),
-              Text(_errorText,
-                style: TextStyle(
-                  color: Colors.orange,
+              Visibility(
+                visible: _errorText.length > 0 ? true : false,
+                child: Card(
+                  shape: StadiumBorder(
+                    side: BorderSide(
+                      color: Colors.red,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: ListTile(
+                    title: Text(_errorText,
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 20,),
@@ -99,18 +112,16 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               SizedBox(height: 10,),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                        side: BorderSide(color: Colors.white)
-                    ),
+              Card(
+                shape: StadiumBorder(
+                  side: BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
                   ),
-                  onPressed: () async{
+                ),
+                color: Colors.red,
+                child: GestureDetector(
+                  onTap: () async {
                     if (_formKey.currentState.validate())
                     {
                       // _isLoading = true;
@@ -122,12 +133,13 @@ class _RegisterState extends State<Register> {
                       });
                     }
                   },
-                  child: Text(
-                    "Register",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
+                  child: ListTile(
+                    title: Center(child: Text("Register",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30.0
+                      ),
+                    )),
                   ),
                 ),
               ),

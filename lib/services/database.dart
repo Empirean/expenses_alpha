@@ -34,6 +34,10 @@ class DatabaseService{
     return ref.snapshots();
   }
 
+  Stream<QuerySnapshot> allDocumentsAndSort({String orderBy, bool descending}){
+    return ref.orderBy(orderBy, descending: descending).snapshots();
+  }
+
   Future<QuerySnapshot> getAllDocuments(){
     return ref.get();
   }

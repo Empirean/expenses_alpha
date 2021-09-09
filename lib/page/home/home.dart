@@ -18,6 +18,9 @@ class _HomeState extends State<Home> {
   String _path;
   DateTime _currentDate;
   List<String> _days;
+  List<DataRow> _dataRows = [];
+  int _sortColumnIndex;
+  bool _isAscending = false;
   var _formatter = NumberFormat('###,###,##0.00');
 
   @override
@@ -73,10 +76,6 @@ class _HomeState extends State<Home> {
               return Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    // colorFilter: ColorFilter.mode(
-                    //     Colors.blue,
-                    //     BlendMode.softLight
-                    // ),
                     image: AssetImage("assets/main.jpg"),
                     fit: BoxFit.cover,
                   ),
@@ -227,7 +226,12 @@ class _HomeState extends State<Home> {
                             child: Row(
                               children: [
                                 StreamBuilder(
-                                    stream: DatabaseService(path: user.uid + "/" + _path + "/EXPENSES").allDocuments(),
+                                    stream: DatabaseService(
+                                        path: user.uid + "/" + _path + "/EXPENSES"
+                                    ).allDocumentsAndSort(
+                                        orderBy: "EXPENSE_NAME",
+                                        descending: !_isAscending
+                                    ),
                                     builder: (context, expenses) {
                                       if (expenses.hasData){
                                         return StreamBuilder(
@@ -236,10 +240,14 @@ class _HomeState extends State<Home> {
                                               if (expenseRows.hasData) {
 
                                                 return  DataTable(
+                                                  decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1)),
+                                                  dividerThickness: 5,
+                                                  showBottomBorder: true,
                                                   headingRowColor: MaterialStateColor.resolveWith((states) => Colors.red),
+                                                  sortColumnIndex: _sortColumnIndex,
+                                                  sortAscending: _isAscending,
                                                   columns: _getColumns(),
                                                   rows:expenseRows.data,);
-
                                               }
                                               else{
 
@@ -328,6 +336,7 @@ class _HomeState extends State<Home> {
     {
       _dataColumns.add(
           new DataColumn(
+            onSort: i == "Entries" ? onSort : null,
               label: Expanded(
                 child: Text(i,
                   style: TextStyle(
@@ -343,6 +352,13 @@ class _HomeState extends State<Home> {
     }
 
     return _dataColumns;
+  }
+
+  void onSort(int columnIndex, bool ascending) {
+    setState(() {
+      this._sortColumnIndex = columnIndex;
+      this._isAscending = ascending;
+    });
   }
 
   int _getNumberOfDays() {
@@ -362,7 +378,7 @@ class _HomeState extends State<Home> {
   }
 
   Stream<List<DataRow>> _getRows(var expenses, String userId) async* {
-    List<DataRow> _dataRows = [];
+    _dataRows = [];
     int _currentDayCount = DateTime(_currentDate.year, _currentDate.month, 0).day;
 
     var expenseData = expenses.data.docs;
@@ -376,6 +392,7 @@ class _HomeState extends State<Home> {
         if (j == 0)
         {
           String _expenseName = expenseData[i]["EXPENSE_NAME"];
+
           if (_expenseName.length > 10) _expenseName = _expenseName.substring(0,9) + "...";
           DataCell dc = new DataCell(
             Text(_expenseName,
@@ -490,9 +507,10 @@ class _HomeState extends State<Home> {
 
         }
       }
+
       _dataRows.add(new DataRow(
-          cells: _cellList,
-          color: MaterialStateColor.resolveWith((states) => Colors.pink.withOpacity(0.9))
+        cells: _cellList,
+        color: MaterialStateColor.resolveWith((states) => Colors.pink.withOpacity(0.9))
       ));
     }
 

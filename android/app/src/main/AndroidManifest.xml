@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hamunchi.expenses_alpha">
    <application
-        android:label="expenses_alpha"
+        android:label="Schemeckle Catto"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

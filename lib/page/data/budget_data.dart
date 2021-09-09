@@ -145,7 +145,7 @@ class _BudgetDataState extends State<BudgetData> {
                 child: Card(
                   child: TextFormField(
                     controller: _controller,
-                    maxLength: 15,
+                    maxLength: _mode == mode.entryName ? 30 : 15,
                     keyboardType: _mode == mode.entryName ? TextInputType.text : TextInputType.numberWithOptions(decimal: true, signed: false),
                     inputFormatters: _mode == mode.entryName ? [] : [
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),

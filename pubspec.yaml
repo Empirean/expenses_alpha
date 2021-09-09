@@ -37,7 +37,15 @@ dev_dependencies:
   firebase_auth: ^3.0.1
   intl: ^0.17.0
   cloud_firestore: ^2.4.0
-  flutter_slidable: ^0.6.0
+  flutter_native_splash: ^1.2.3
+
+flutter_native_splash:
+  color: "#ff0000"
+  image: "assets/playstore.png"
+  android: true
+  ios: true
+  android_gravity: fill
+  ios_content_mode: scaleAspectFill
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
