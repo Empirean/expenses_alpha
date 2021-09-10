@@ -45,11 +45,11 @@ class _HomeState extends State<Home> {
               ),
               onPressed: () async {
                 setState(() {
-                  AuthenticationService().signOut();
+                  Navigator.pushNamed(context, "/settings");
                 });
               },
-              icon: Icon(Icons.logout),
-              label: Text("Logout")
+              icon: Icon(Icons.settings),
+              label: Text("")
           )
         ],
       ),

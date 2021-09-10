@@ -1,5 +1,7 @@
 import 'package:expenses_alpha/page/data/budget_data.dart';
+import 'package:expenses_alpha/page/home/about.dart';
 import 'package:expenses_alpha/page/home/calendar.dart';
+import 'package:expenses_alpha/page/home/settings.dart';
 import 'package:expenses_alpha/page/wrapper.dart';
 import 'package:expenses_alpha/services/authentication.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,8 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/budget_data' : (context) => BudgetData(),
           '/calendar' : (context) => Calendar(),
+          '/settings' : (context) => Settings(),
+          '/about' : (context) => About(),
         },
         color: Colors.red,
         home: Wrapper(),
