@@ -8,13 +8,11 @@ import 'package:intl/intl.dart';
 import 'package:expenses_alpha/shared/modesenum.dart';
 
 class Home extends StatefulWidget {
-
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-
 
   String _path;
   DateTime _currentDate;
@@ -28,7 +26,6 @@ class _HomeState extends State<Home> {
     super.initState();
     _currentDate = DateTime.now();
     _days = _generateDayList(_currentDate);
-
   }
 
   @override
@@ -174,8 +171,18 @@ class _HomeState extends State<Home> {
                                       Expanded(
                                         flex: 5,
                                         child: GestureDetector(
-                                          onTap: () {
-                                            print("show calendar");
+                                          onTap: () async {
+                                            dynamic _result = await Navigator.pushNamed(context, "/calendar", arguments: {
+                                              "STARTING_DATE" : _currentDate
+                                            });
+
+                                            if (_result != null){
+                                              setState(() {
+                                                _currentDate =  new DateTime(_result["NEW_DATE"].year, _result["NEW_DATE"].month, _currentDate.day);
+                                                _days = _generateDayList(_currentDate);
+                                              });
+                                            }
+
                                           },
                                           child: ListTile(
                                             title: Center(
