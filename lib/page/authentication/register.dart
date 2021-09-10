@@ -1,8 +1,10 @@
 import 'package:expenses_alpha/services/authentication.dart';
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:expenses_alpha/shared/loading.dart';
 import 'package:expenses_alpha/shared/textdecor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Register extends StatefulWidget {
   final Function toggleView;
@@ -19,17 +21,31 @@ class _RegisterState extends State<Register> {
   String _errorText = "";
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
+  Color _currentMainColor;
+  Color _currentHighlightColor;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () async {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red,
+        backgroundColor: _currentMainColor,
         title: Text("Register"),
         actions: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: Colors.red
+              primary: _currentMainColor
             ),
             icon: Icon(Icons.login),
             label: Text("Login"),
@@ -78,6 +94,7 @@ class _RegisterState extends State<Register> {
                   ),
                   cursorColor: Colors.white,
                   decoration: textDecoration.copyWith(
+                    fillColor: _currentHighlightColor,
                     hintText: "email@example.com",
                     hintStyle: TextStyle(
                       color: Colors.white,
@@ -100,6 +117,7 @@ class _RegisterState extends State<Register> {
                   ),
                   cursorColor: Colors.white,
                   decoration: textDecoration.copyWith(
+                    fillColor: _currentHighlightColor,
                     hintText: "password",
                     hintStyle: TextStyle(
                       color: Colors.white,
@@ -121,7 +139,7 @@ class _RegisterState extends State<Register> {
                     width: 1.0,
                   ),
                 ),
-                color: Colors.red,
+                color: _currentMainColor,
                 child: GestureDetector(
                   onTap: () async {
                     FocusScope.of(context).unfocus();
