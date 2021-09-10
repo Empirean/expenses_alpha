@@ -1,4 +1,6 @@
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({Key key}) : super(key: key);
@@ -12,11 +14,19 @@ class _CalendarState extends State<Calendar> {
   DateTime _currentDate = DateTime.now();
   int _selectedIndex = 0;
   Map _data = {};
+  Color _currentMainColor;
+  Color _currentHighlightColor;
 
   @override
   void initState() {
-    Future.delayed(Duration.zero,(){
+    Future.delayed(Duration.zero,() async {
       _data = ModalRoute.of(context).settings.arguments;
+
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
 
       if (_data != null) {
         setState(() {
@@ -34,7 +44,7 @@ class _CalendarState extends State<Calendar> {
     return Scaffold(
       appBar: AppBar(
         shadowColor: Colors.white,
-        backgroundColor: Colors.red,
+        backgroundColor: _currentMainColor,
         title: Text("Calendar"),
       ),
       body: Container(
@@ -54,7 +64,7 @@ class _CalendarState extends State<Calendar> {
                     children: [
                       Expanded(
                         child: Card(
-                          color: Colors.red,
+                          color: _currentMainColor,
                           shape: StadiumBorder(
                               side: BorderSide(
                                   color: Colors.white,
@@ -135,7 +145,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 1 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 1 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -164,7 +174,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 2 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 2 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -193,7 +203,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 3 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 3 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -227,7 +237,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 4 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 4 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -256,7 +266,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 5 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 5 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -285,7 +295,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 6 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 6 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -319,7 +329,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 7 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 7 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -348,7 +358,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 8 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 8 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -377,7 +387,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 9 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 9 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -411,7 +421,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 10 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 10 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -440,7 +450,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 11 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 11 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -469,7 +479,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: _selectedIndex == 12 ? Colors.pink : Colors.red,
+                    color: _selectedIndex == 12 ? _currentHighlightColor : _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -503,7 +513,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: Colors.red,
+                    color: _currentHighlightColor,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -529,7 +539,7 @@ class _CalendarState extends State<Calendar> {
                         width: 1.0,
                       ),
                     ),
-                    color: Colors.red,
+                    color: _currentMainColor,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pop(context, {

@@ -1,19 +1,40 @@
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class About extends StatelessWidget {
+class About extends StatefulWidget {
   const About({Key key}) : super(key: key);
 
+  @override
+  _AboutState createState() => _AboutState();
+}
+
+class _AboutState extends State<About> {
+  Color _currentMainColor;
+  Color _currentHighlightColor;
   final String _url = r"https://github.com/Empirean/expenses_alpha/releases";
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () async {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         shadowColor: Colors.white,
-        backgroundColor: Colors.red,
-        title: Text("Settings"),
+        backgroundColor: _currentMainColor,
+        title: Text("About"),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -24,7 +45,7 @@ class About extends StatelessWidget {
         ),
         child: Column(
           children: [
-            SizedBox(height: 50,),
+            Spacer(),
             Center(
               child: GestureDetector(
                 onTap: () async {
@@ -34,11 +55,12 @@ class About extends StatelessWidget {
                 },
                 child: CircleAvatar(
                   radius: 135,
-                  backgroundColor: Colors.pink,
+                  backgroundColor: _currentHighlightColor,
                   child: CircleAvatar(
                     radius: 132,
                     backgroundColor: Colors.white,
                     child: QrImage(
+                      foregroundColor: _currentMainColor,
                       data: _url,
                       version: QrVersions.auto,
                       size: 210.0,
@@ -64,9 +86,11 @@ class About extends StatelessWidget {
                 ),
               ),
             ),
+            Spacer(),
           ],
         ),
       ),
     );
   }
 }
+

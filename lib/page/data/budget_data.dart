@@ -1,10 +1,12 @@
 import 'package:expenses_alpha/models/expenseuser.dart';
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:expenses_alpha/shared/modesenum.dart';
 import 'package:expenses_alpha/shared/textdecor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:expenses_alpha/services/database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BudgetData extends StatefulWidget {
   @override
@@ -27,10 +29,19 @@ class _BudgetDataState extends State<BudgetData> {
   String _path = "";
   int _index;
   List<dynamic> _expenseSet = [];
+  Color _currentMainColor;
+  Color _currentHighlightColor;
 
   @override
   void initState() {
-    Future.delayed(Duration.zero,(){
+    Future.delayed(Duration.zero,() async {
+
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
+
       _controller.clear();
       _data = ModalRoute.of(context).settings.arguments;
       if (_data != null) {
@@ -85,12 +96,12 @@ class _BudgetDataState extends State<BudgetData> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red,
+        backgroundColor: _currentMainColor,
         title: Text(_title),
         actions: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-                primary: Colors.red
+                primary: _currentMainColor
             ),
             icon: Icon(Icons.save_rounded),
             label: SizedBox(),
@@ -164,6 +175,7 @@ class _BudgetDataState extends State<BudgetData> {
                     ),
                     cursorColor: Colors.white,
                     decoration: textDecoration.copyWith(
+                      fillColor: _currentHighlightColor,
                       hintText: _hint,
                       hintStyle: TextStyle(
                         color: Colors.white

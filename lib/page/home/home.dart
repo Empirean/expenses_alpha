@@ -1,11 +1,12 @@
 import 'package:expenses_alpha/models/expenseuser.dart';
-import 'package:expenses_alpha/services/authentication.dart';
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:expenses_alpha/services/database.dart';
 import 'package:expenses_alpha/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:expenses_alpha/shared/modesenum.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -21,11 +22,21 @@ class _HomeState extends State<Home> {
   bool _isAscending = false;
   var _formatter = NumberFormat('###,###,##0.00');
 
+  Color _currentMainColor;
+  Color _currentHighlightColor;
+
   @override
   void initState() {
-    super.initState();
+    Future.delayed(Duration.zero, () async {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
+    });
     _currentDate = DateTime.now();
     _days = _generateDayList(_currentDate);
+    super.initState();
   }
 
   @override
@@ -33,15 +44,15 @@ class _HomeState extends State<Home> {
     final user = Provider.of<ExpenseUser>(context, listen: false);
 
     return Scaffold(
-      backgroundColor: Colors.pink,
+      backgroundColor: _currentHighlightColor,
       appBar: AppBar(
         shadowColor: Colors.white,
-        backgroundColor: Colors.red,
+        backgroundColor: _currentMainColor,
         title: Text("Expenses"),
         actions: [
           ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                  primary: Colors.red
+                  primary: _currentMainColor
               ),
               onPressed: () async {
                 setState(() {
@@ -98,7 +109,7 @@ class _HomeState extends State<Home> {
                             width: 1.0,
                           ),
                         ),
-                        color: Colors.red,
+                        color: _currentMainColor,
                         child: ListTile(
                           title:
                             Center(
@@ -140,7 +151,7 @@ class _HomeState extends State<Home> {
                             children: [
                               Expanded(
                                 child: Card(
-                                  color: Colors.red,
+                                  color: _currentMainColor,
                                   shape: StadiumBorder(
                                       side: BorderSide(
                                           color: Colors.white,
@@ -246,20 +257,30 @@ class _HomeState extends State<Home> {
                                             stream: _getRows(expenses, user.uid),
                                             builder: (context, expenseRows) {
                                               if (expenseRows.hasData) {
+                                                try {
+                                                  return  DataTable(
+                                                    decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1)),
+                                                    dividerThickness: 5,
+                                                    showBottomBorder: true,
+                                                    headingRowColor: MaterialStateColor.resolveWith((states) => _currentMainColor),
+                                                    sortColumnIndex: _sortColumnIndex,
+                                                    sortAscending: _isAscending,
+                                                    columns: _getColumns(),
+                                                    rows:expenseRows.data,);
+                                                }
+                                                catch (e) {
+
+                                                }
                                                 return  DataTable(
-                                                  decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1)),
-                                                  dividerThickness: 5,
-                                                  showBottomBorder: true,
-                                                  headingRowColor: MaterialStateColor.resolveWith((states) => Colors.red),
-                                                  sortColumnIndex: _sortColumnIndex,
-                                                  sortAscending: _isAscending,
+                                                  headingRowColor: MaterialStateColor.resolveWith(
+                                                          (states) => _currentMainColor),
                                                   columns: _getColumns(),
-                                                  rows:expenseRows.data,);
+                                                  rows:[],);
                                               }
                                               else{
                                                 return  DataTable(
                                                   headingRowColor: MaterialStateColor.resolveWith(
-                                                          (states) => Colors.red),
+                                                          (states) => _currentMainColor),
                                                   columns: _getColumns(),
                                                   rows:[],);
                                               }
@@ -269,7 +290,7 @@ class _HomeState extends State<Home> {
                                       else {
                                         return  DataTable(
                                           headingRowColor: MaterialStateColor.resolveWith(
-                                                  (states) => Colors.red),
+                                                  (states) => _currentMainColor),
                                           columns: _getColumns(),
                                           rows:[],);
                                       }
@@ -286,7 +307,7 @@ class _HomeState extends State<Home> {
                           width: 1.0,
                         ),
                       ),
-                      color: Colors.red,
+                      color: _currentMainColor,
                       child: GestureDetector(
                         onTap: () {
                           List<double> _expensesInitEntries = [];
@@ -410,7 +431,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             onLongPress: () {
-              showModalBottomSheet(backgroundColor: Colors.pink.withOpacity(0.9),
+              showModalBottomSheet(backgroundColor: _currentHighlightColor,
                   context: context,
                   builder: (context) {
                 return Column(
@@ -430,7 +451,7 @@ class _HomeState extends State<Home> {
                           width: 1.0,
                         ),
                       ),
-                      color: Colors.red,
+                      color: _currentMainColor,
                       child: GestureDetector(
                         onTap: () {
                           DatabaseService(path: userId + "/" + _path + "/EXPENSES").deleteExpenseEntry(expenseData[i].id);
@@ -453,7 +474,7 @@ class _HomeState extends State<Home> {
                           width: 1.0,
                         ),
                       ),
-                      color: Colors.red,
+                      color: _currentMainColor,
                       child: GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
@@ -518,7 +539,7 @@ class _HomeState extends State<Home> {
 
       _dataRows.add(new DataRow(
         cells: _cellList,
-        color: MaterialStateColor.resolveWith((states) => Colors.pink.withOpacity(0.9))
+        color: MaterialStateColor.resolveWith((states) => _currentHighlightColor)
       ));
     }
 

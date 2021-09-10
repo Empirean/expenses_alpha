@@ -1,6 +1,7 @@
 import 'package:expenses_alpha/services/authentication.dart';
+import 'package:expenses_alpha/services/colorpreference.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key key}) : super(key: key);
@@ -10,12 +11,28 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+
+  Color _currentMainColor;
+  Color _currentHighlightColor;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () async {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _currentMainColor = ColorPreference().getMainColor(_prefs);
+        _currentHighlightColor = ColorPreference().getHighColor(_prefs);
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         shadowColor: Colors.white,
-        backgroundColor: Colors.red,
+        backgroundColor: _currentMainColor,
         title: Text("Settings"),
       ),
       body: Container(
@@ -27,6 +44,7 @@ class _SettingsState extends State<Settings> {
         ),
         child: Column(
           children: [
+            Spacer(),
             Card(
               shape: StadiumBorder(
                 side: BorderSide(
@@ -34,11 +52,11 @@ class _SettingsState extends State<Settings> {
                   width: 1.0,
                 ),
               ),
-              color: Colors.red,
+              color: _currentMainColor,
               child: GestureDetector(
                 onTap: () async {
                   setState(() {
-
+                    Navigator.pushNamed(context, "/preferences");
                   });
                 },
                 child: ListTile(
@@ -60,7 +78,7 @@ class _SettingsState extends State<Settings> {
                   width: 1.0,
                 ),
               ),
-              color: Colors.red,
+              color: _currentMainColor,
               child: GestureDetector(
                 onTap: () async {
                   Navigator.pushNamed(context, "/about");
@@ -84,7 +102,7 @@ class _SettingsState extends State<Settings> {
                   width: 1.0,
                 ),
               ),
-              color: Colors.pink,
+              color: _currentHighlightColor,
               child: GestureDetector(
                 onTap: () async {
                   setState(() {
@@ -104,6 +122,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
             ),
+            Spacer()
           ],
         ),
       ),
